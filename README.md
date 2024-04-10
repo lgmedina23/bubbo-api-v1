@@ -1,73 +1,174 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+## Create the Todo App
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+1. **Install NestJS CLI:**
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+    ```bash
+    npm install -g @nestjs/cli
+    ```
 
-## Description
+2. **Create a new NestJS project:**
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+    ```bash
+    nest new nestjs-todo-app
+    ```
 
-## Installation
+3. **Navigate into the project directory:**
 
-```bash
-$ npm install
-```
+    ```bash
+    cd nestjs-todo-app
+    ```
 
-## Running the app
+4. **Install dependencies:**
 
-```bash
-# development
-$ npm run start
+    ```bash
+    npm install
+    ```
 
-# watch mode
-$ npm run start:dev
+5. **Set up PostgreSQL:**
 
-# production mode
-$ npm run start:prod
-```
+    - Make sure PostgreSQL is running.
+    - Create a new PostgreSQL database for the application.
 
-## Test
+6. **Configure environment variables:**
 
-```bash
-# unit tests
-$ npm run test
+    - Rename `.env.example` file to `.env` and fill in the necessary environment variables such as `DB_HOST`, `DB_PORT`, `DB_USERNAME`, `DB_PASSWORD`, and `DB_DATABASE`.
 
-# e2e tests
-$ npm run test:e2e
+7. **Create a new Todo module using Nest CLI:**
 
-# test coverage
-$ npm run test:cov
-```
+    ```bash
+    nest g module todos
+    ```
 
-## Support
+8. **Create a Todo entity class under the new module:**
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+    ```bash
+    nest g class todos/entities/todo
+    ```
 
-## Stay in touch
+9. **Create a Todo service under the new module:**
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+    ```bash
+    nest g service todos/services/todo
+    ```
 
-## License
+10. **Create a Todo controller under the new module:**
 
-Nest is [MIT licensed](LICENSE).
+    ```bash
+    nest g controller todos/controllers/todo
+    ```
+
+11. **Update `src/app.module.ts` to import and use the new Todo module:**
+
+    ```typescript
+    import { Module } from '@nestjs/common';
+    import { ConfigModule } from '@nestjs/config';
+    import { TypeOrmModule } from '@nestjs/typeorm';
+    import { Todo } from './entities/todo.entity';
+    import { TodosModule } from './todos/todos.module';
+    import { AppController } from './app.controller';
+    import { AppService } from './app.service';
+
+    @Module({
+      imports: [
+        ConfigModule.forRoot(),
+        TypeOrmModule.forRoot({
+          type: 'postgres',
+          host: process.env.DB_HOST,
+          port: parseInt(process.env.DB_PORT, 10),
+          username: process.env.DB_USERNAME,
+          password: process.env.DB_PASSWORD,
+          database: process.env.DB_DATABASE,
+          ssl: {
+            rejectUnauthorized: false,
+          },
+          entities: [
+            Todo
+          ],
+          synchronize: true,
+          migrations: [],
+          subscribers: [],
+        }),
+        TodosModule
+      ],
+      controllers: [AppController],
+      providers: [AppService],
+    })
+    export class AppModule {}
+    ```
+
+12. **Change the application port to 8080 (Default port for elastic Beanstalck):**
+
+    - Open the `src/main.ts` file.
+    - Update the `await app.listen()` line to use port 8080:
+
+    ```typescript
+    await app.listen(process.env.PORT);
+    ```
+
+13. **Start the application:**
+
+    ```bash
+    npm run start:dev
+    ```
+
+14. **Open your browser and navigate to `http://localhost:3000` to see the app in action.**
+
+
+
+## Deploy To Elastic Beanstalck
+
+## AWS Setup
+
+### a. IAM (Identity and Access Management) Setup:
+
+1. Go to the [AWS Management Console](https://aws.amazon.com/console/) and navigate to IAM.
+2. Create a new IAM role with necessary permissions for Elastic Beanstalk to access other AWS services like RDS and EC2.
+3. Attach policies like `AWSElasticBeanstalkFullAccess`, `AmazonRDSFullAccess`, and `AmazonEC2FullAccess` to the IAM role.
+
+### b. RDS (Relational Database Service) Setup:
+
+1. Navigate to the [RDS service](https://aws.amazon.com/rds/) in the AWS Management Console.
+2. Create a new PostgreSQL database instance.
+3. Configure the database instance with desired specifications (instance type, storage, etc.).
+4. Make sure to note down the endpoint, username, password, and database name for later use.
+5. Grant acces do the database from my local machine (make it public)
+
+## Configuring Elastic Beanstalk
+
+1. **Navigate to Elastic Beanstalk:**
+   - Go to the [AWS Management Console](https://aws.amazon.com/console/).
+   - In the "Find Services" search bar, type "Elastic Beanstalk" and select it from the options.
+
+2. **Create a New Application:**
+   - Click on "Create Application".
+   - Enter a name for your application.
+   - Optionally, add a description.
+   - Click on "Create".
+
+3. **Create a New Environment:**
+   - Once your application is created, click on "Create a new environment".
+   - Choose the web server environment type that matches your application (e.g., Node.js, Python, PHP, etc.).
+   - Select the appropriate platform version.
+   - Choose a preconfigured sample application or upload your application code.
+   - Click on "Configure more options" to customize your environment settings if needed.
+
+4. **Configure Environment Settings:**
+   - Configure the environment settings such as instance type, key pair (for SSH access), environment variables, and database configuration (if using RDS).
+   - Configure db environment also exposed port
+   - Optionally, enable logging, monitoring, and other advanced settings as per your requirements.
+
+5. **Create Environment:**
+   - Review the configuration details.
+   - Click on "Create environment" to launch your Elastic Beanstalk environment.
+
+6. **Wait for Deployment:**
+   - Elastic Beanstalk will start creating your environment and deploying your application.
+   - This process may take several minutes to complete. You can monitor the progress in the Elastic Beanstalk console.
+
+7. **Accessing Your Application:**
+   - Once the deployment is complete, Elastic Beanstalk will provide you with a URL where you can access your application.
+   - Click on the URL to view your deployed application in a web browser.
+
+8. **Manage and Monitor:**
+   - You can manage and monitor your Elastic Beanstalk environment from the AWS Management Console.
+   - View environment health, logs, and metrics to monitor the performance of your application.
