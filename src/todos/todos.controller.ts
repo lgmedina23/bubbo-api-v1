@@ -2,7 +2,9 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { TodosService } from './todos.service';
 import { CreateTodoDto } from './dto/create-todo.dto';
 import { UpdateTodoDto } from './dto/update-todo.dto';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('todo')
 @Controller('todos')
 export class TodosController {
   constructor(private readonly todosService: TodosService) {}
