@@ -1,0 +1,5 @@
+export const enum TodoStatus{
+    INPROGRESS='INPROGRESS',
+    COMPLETED='COMPLETED',
+    CANCELED='CANCELED'
+}

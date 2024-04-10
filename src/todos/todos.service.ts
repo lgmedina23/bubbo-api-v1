@@ -4,6 +4,7 @@ import { UpdateTodoDto } from './dto/update-todo.dto';
 import { Todo } from './entities/todo.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { TodoStatus } from './enum/todoStatus';
 
 @Injectable()
 export class TodosService {
@@ -14,6 +15,7 @@ export class TodosService {
 
   async create(createTodoDto: CreateTodoDto): Promise<Todo> {
     try {
+      createTodoDto.status=TodoStatus.INPROGRESS
       const todo = this.todoRepository.create(createTodoDto);
       return await this.todoRepository.save(todo);
     } catch (error) {

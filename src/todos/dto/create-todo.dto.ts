@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsString, IsBoolean, IsOptional, IsDate } from 'class-validator';
+import { TodoStatus } from '../enum/todoStatus';
 
 export class CreateTodoDto {
 
@@ -11,6 +12,8 @@ export class CreateTodoDto {
     @ApiProperty()
     @IsBoolean()
     completed: boolean;
+
+    status: TodoStatus;
 
 
     @ApiProperty()

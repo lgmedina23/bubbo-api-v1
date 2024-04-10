@@ -1,4 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { TodoStatus } from '../enum/todoStatus';
 
 @Entity()
 export class Todo {
@@ -10,6 +11,9 @@ export class Todo {
 
   @Column({ default: false })
   completed: boolean;
+
+  @Column({ nullable: true })
+  status: TodoStatus
 
   @Column({ nullable: true })
   description?: string;
